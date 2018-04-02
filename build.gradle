@@ -1,0 +1,23 @@
+group 'me.takuti'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "http://conjars.org/repo"
+    }
+}
+
+dependencies {
+    compile 'org.apache.hive:hive-exec:2.3.2'
+    compile 'org.apache.hivemall:hivemall-all:0.5.0-incubating'
+    compile 'org.reflections:reflections:0.9.10'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+mainClassName = 'HivemallUdfList'
