@@ -9,6 +9,7 @@ repositories {
     mavenCentral()
 
     maven {
+        // workaround from https://stackoverflow.com/questions/32587769/dependency-resolution-issue-in-gradle
         url "http://conjars.org/repo"
     }
 }
