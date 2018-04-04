@@ -8,15 +8,16 @@ public class HivemallUdfList {
         Reflections reflections = new Reflections("hivemall");
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Description.class);
         for (Class<?> clazz : annotated) {
-            String s = "";
+            Description desc = clazz.getAnnotation(Description.class);
+            String s = "- " + desc.value().replaceAll("_FUNC_\\(([^)]*)\\)", "`" + desc.name() + "($1)`");
+            if (!desc.extended().isEmpty()) {
+                s += "<br />" + desc.extended();
+            }
 
             Deprecated deprecated = clazz.getAnnotation(Deprecated.class);
             if (deprecated != null) {
-                s += "[deprecated] ";
+                s += " **[deprecated]**";
             }
-
-            Description desc = clazz.getAnnotation(Description.class);
-            s += desc.name() + " " + desc.value() + " " + desc.extended();
 
             System.out.println(s);
         }
