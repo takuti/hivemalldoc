@@ -1,4 +1,3 @@
-import hivemall.annotations.Since;
 import org.reflections.Reflections;
 import org.apache.hadoop.hive.ql.exec.Description;
 
@@ -14,12 +13,6 @@ public class HivemallUdfList {
             Deprecated deprecated = clazz.getAnnotation(Deprecated.class);
             if (deprecated != null) {
                 s += "[deprecated] ";
-            }
-
-            // FIXME: Since `RetentionPolicy.SOURCE` is set to this annotation, `getAnnotation()` always returns null.
-            Since since = clazz.getAnnotation(Since.class);
-            if (since != null) {
-                s += "[since " + since.version() + "] ";
             }
 
             Description desc = clazz.getAnnotation(Description.class);
