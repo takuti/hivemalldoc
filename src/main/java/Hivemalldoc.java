@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class HivemallUdfList {
+public class Hivemalldoc {
     public static void main(String... args) {
         Reflections reflections = new Reflections("hivemall");
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Description.class);
