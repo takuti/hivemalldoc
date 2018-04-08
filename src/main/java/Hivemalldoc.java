@@ -5,8 +5,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Hivemalldoc {
+    private static final String INDENT = "  ";
+
     public static void main(String... args) {
         Reflections reflections = new Reflections("hivemall");
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Description.class);
@@ -14,20 +18,29 @@ public class Hivemalldoc {
         StringBuilder sb = new StringBuilder();
         Map<String, Set<String>> packages = new TreeMap<>();
 
+        Pattern usage = Pattern.compile("_FUNC_\\((.*?)\\)");
+
         for (Class<?> clazz : annotated) {
             Description desc = clazz.getAnnotation(Description.class);
-            sb.append("- " + desc.name());
 
+            sb.append("- ").append(desc.name());
             Deprecated deprecated = clazz.getAnnotation(Deprecated.class);
             if (deprecated != null) {
-                sb.append(" **[deprecated]**");
+                sb.append(" ").append("**[deprecated]**");
             }
-            sb.append("\n  ");
+            sb.append("\n");
 
-            sb.append(desc.value().replaceAll("_FUNC_\\(([^)]*)\\)", "```sql\n  " + desc.name() + "($1)\n  ```\n  "));
+            sb.append(INDENT);
+            Matcher matcher = usage.matcher(desc.value());
+            if (matcher.find()) {
+                sb.append(matcher.replaceAll("```sql\n" + INDENT + desc.name() + "($1)\n" + INDENT + "```\n" + INDENT));
+            } else {
+                sb.append(desc.value());
+            }
+            sb.append("\n");
 
             if (!desc.extended().isEmpty()) {
-                sb.append("\n  - " + desc.extended());
+                sb.append(INDENT).append("- ").append(desc.extended());
             }
 
             String packageName = clazz.getPackage().getName();
