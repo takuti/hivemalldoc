@@ -16,6 +16,18 @@ import java.util.regex.Pattern;
 public class Hivemalldoc {
 
     public static void main(String... args) {
+        Map<String, Set<String>> packages = getHivemallPerPackageDocumentSet();
+
+        for (Map.Entry<String, Set<String>> e : packages.entrySet()) {
+            System.out.println(MarkdownUtils.asHeader(e.getKey(), 3));
+            for (String desc : e.getValue()) {
+                System.out.println(desc);
+            }
+            System.out.println();
+        }
+    }
+
+    private static Map<String, Set<String>> getHivemallPerPackageDocumentSet() {
         Reflections reflections = new Reflections("hivemall");
         Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(Description.class);
 
@@ -57,12 +69,6 @@ public class Hivemalldoc {
             StringUtils.clear(sb);
         }
 
-        for (Map.Entry<String, Set<String>> e : packages.entrySet()) {
-            System.out.println(MarkdownUtils.asHeader(e.getKey(), 3));
-            for (String desc : e.getValue()) {
-                System.out.println(desc);
-            }
-            System.out.println();
-        }
+        return packages;
     }
 }
