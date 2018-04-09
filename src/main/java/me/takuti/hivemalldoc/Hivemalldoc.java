@@ -1,5 +1,6 @@
 package me.takuti.hivemalldoc;
 
+import me.takuti.hivemalldoc.utils.MarkdownUtils;
 import me.takuti.hivemalldoc.utils.StringUtils;
 
 import org.reflections.Reflections;
@@ -21,16 +22,16 @@ public class Hivemalldoc {
         StringBuilder sb = new StringBuilder();
         Map<String, Set<String>> packages = new TreeMap<>();
 
-        Pattern func = Pattern.compile("_FUNC_\\((.*?)\\)");
+        Pattern func = Pattern.compile("_FUNC_(\\(.*?\\))(.*)$");
 
         for (Class<?> annotatedClass : annotatedClasses) {
             Description description = annotatedClass.getAnnotation(Description.class);
 
-            sb.append("- ").append(description.name());
+            sb.append(MarkdownUtils.asListElement(description.name()));
 
             Deprecated deprecated = annotatedClass.getAnnotation(Deprecated.class);
             if (deprecated != null) {
-                sb.append(" ").append("**[deprecated]**");
+                sb.append(" ").append(MarkdownUtils.asBold("[deprecated]"));
             }
 
             sb.append("\n");
@@ -38,25 +39,26 @@ public class Hivemalldoc {
             String value = description.value();
             Matcher matcher = func.matcher(value);
             if (matcher.find()) {
-                value = matcher.replaceAll("```sql\n" + description.name() + "($1)\n" + "```\n");
+                value = MarkdownUtils.asCodeBlock(description.name() + matcher.group(1), "sql")
+                        + matcher.group(2).trim();
             }
             sb.append(StringUtils.indent(value));
 
             if (!description.extended().isEmpty()) {
                 sb.append("\n");
-                sb.append(StringUtils.indent("- ")).append(description.extended());
+                sb.append(StringUtils.indent(MarkdownUtils.asListElement(description.extended())));
             }
 
             String packageName = annotatedClass.getPackage().getName();
             packages.computeIfAbsent(packageName, k -> new TreeSet<>());
-            Set<String> descList = packages.get(packageName);
-            descList.add(sb.toString());
+            Set<String> List = packages.get(packageName);
+            List.add(sb.toString());
 
             StringUtils.clear(sb);
         }
 
         for (Map.Entry<String, Set<String>> e : packages.entrySet()) {
-            System.out.println("### " + e.getKey() + "\n");
+            System.out.println(MarkdownUtils.asHeader(e.getKey(), 3));
             for (String desc : e.getValue()) {
                 System.out.println(desc);
             }
