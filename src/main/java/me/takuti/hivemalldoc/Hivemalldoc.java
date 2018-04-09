@@ -1,5 +1,7 @@
 package me.takuti.hivemalldoc;
 
+import me.takuti.hivemalldoc.utils.StringUtils;
+
 import org.reflections.Reflections;
 import org.apache.hadoop.hive.ql.exec.Description;
 
@@ -11,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Hivemalldoc {
-    private static final String TAB = "  ";
 
     public static void main(String... args) {
         Reflections reflections = new Reflections("hivemall");
@@ -39,11 +40,11 @@ public class Hivemalldoc {
             if (matcher.find()) {
                 value = matcher.replaceAll("```sql\n" + description.name() + "($1)\n" + "```\n");
             }
-            sb.append(indent(value));
+            sb.append(StringUtils.indent(value));
             sb.append("\n");
 
             if (!description.extended().isEmpty()) {
-                sb.append(indent("- ")).append(description.extended());
+                sb.append(StringUtils.indent("- ")).append(description.extended());
             }
 
             String packageName = annotatedClass.getPackage().getName();
@@ -51,7 +52,7 @@ public class Hivemalldoc {
             Set<String> descList = packages.get(packageName);
             descList.add(sb.toString());
 
-            clear(sb);
+            StringUtils.clear(sb);
         }
 
         for (Map.Entry<String, Set<String>> e : packages.entrySet()) {
@@ -61,13 +62,5 @@ public class Hivemalldoc {
             }
             System.out.println();
         }
-    }
-
-    private static String indent(final String s) {
-        return TAB + s.replaceAll("(\\r\\n|\\r|\\n)", "$1" + TAB);
-    }
-
-    private static void clear(final StringBuilder sb) {
-        sb.setLength(0);
     }
 }
