@@ -1,3 +1,5 @@
+package me.takuti.hivemalldoc;
+
 import org.reflections.Reflections;
 import org.apache.hadoop.hive.ql.exec.Description;
 
