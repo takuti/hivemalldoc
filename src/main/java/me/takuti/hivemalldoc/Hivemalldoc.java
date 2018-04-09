@@ -41,9 +41,9 @@ public class Hivemalldoc {
                 value = matcher.replaceAll("```sql\n" + description.name() + "($1)\n" + "```\n");
             }
             sb.append(StringUtils.indent(value));
-            sb.append("\n");
 
             if (!description.extended().isEmpty()) {
+                sb.append("\n");
                 sb.append(StringUtils.indent("- ")).append(description.extended());
             }
 
