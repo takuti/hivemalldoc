@@ -9,41 +9,42 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Hivemalldoc {
-    private static final String INDENT = "  ";
+    private static final String TAB = "  ";
 
     public static void main(String... args) {
         Reflections reflections = new Reflections("hivemall");
-        Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(Description.class);
+        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(Description.class);
 
         StringBuilder sb = new StringBuilder();
         Map<String, Set<String>> packages = new TreeMap<>();
 
-        Pattern usage = Pattern.compile("_FUNC_\\((.*?)\\)");
+        Pattern func = Pattern.compile("_FUNC_\\((.*?)\\)");
 
-        for (Class<?> clazz : annotated) {
-            Description desc = clazz.getAnnotation(Description.class);
+        for (Class<?> annotatedClass : annotatedClasses) {
+            Description description = annotatedClass.getAnnotation(Description.class);
 
-            sb.append("- ").append(desc.name());
-            Deprecated deprecated = clazz.getAnnotation(Deprecated.class);
+            sb.append("- ").append(description.name());
+
+            Deprecated deprecated = annotatedClass.getAnnotation(Deprecated.class);
             if (deprecated != null) {
                 sb.append(" ").append("**[deprecated]**");
             }
+
             sb.append("\n");
 
-            sb.append(INDENT);
-            Matcher matcher = usage.matcher(desc.value());
+            String value = description.value();
+            Matcher matcher = func.matcher(value);
             if (matcher.find()) {
-                sb.append(matcher.replaceAll("```sql\n" + INDENT + desc.name() + "($1)\n" + INDENT + "```\n" + INDENT));
-            } else {
-                sb.append(desc.value());
+                value = matcher.replaceAll("```sql\n" + description.name() + "($1)\n" + "```\n");
             }
+            sb.append(indent(value));
             sb.append("\n");
 
-            if (!desc.extended().isEmpty()) {
-                sb.append(INDENT).append("- ").append(desc.extended());
+            if (!description.extended().isEmpty()) {
+                sb.append(indent("- ")).append(description.extended());
             }
 
-            String packageName = clazz.getPackage().getName();
+            String packageName = annotatedClass.getPackage().getName();
             packages.computeIfAbsent(packageName, k -> new TreeSet<>());
             Set<String> descList = packages.get(packageName);
             descList.add(sb.toString());
@@ -58,6 +59,10 @@ public class Hivemalldoc {
             }
             System.out.println();
         }
+    }
+
+    private static String indent(final String s) {
+        return TAB + s.replaceAll("(\\r\\n|\\r|\\n)", "$1" + TAB);
     }
 
     private static void clear(final StringBuilder sb) {
