@@ -39,6 +39,11 @@ public class Hivemalldoc {
         Pattern func = Pattern.compile("_FUNC_(\\(.*?\\))(.*)", Pattern.DOTALL);
 
         for (Class<?> annotatedClass : annotatedClasses) {
+            Deprecated deprecated = annotatedClass.getAnnotation(Deprecated.class);
+            if (deprecated != null) {
+                continue;
+            }
+
             Description description = annotatedClass.getAnnotation(Description.class);
 
             String[] values = description.value().split("\n", 2);
@@ -50,11 +55,6 @@ public class Hivemalldoc {
                         + escapeHtml(matcher.group(2));
             }
             sb.append(MarkdownUtils.asListElement(value));
-
-            Deprecated deprecated = annotatedClass.getAnnotation(Deprecated.class);
-            if (deprecated != null) {
-                sb.append(" ").append(MarkdownUtils.asBold("[deprecated]"));
-            }
 
             StringBuilder sbExtended = new StringBuilder();
             if (values.length == 2) {
