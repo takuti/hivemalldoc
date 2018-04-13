@@ -25,7 +25,6 @@ public class Hivemalldoc {
             for (String desc : e.getValue()) {
                 System.out.println(desc);
             }
-            System.out.println();
         }
     }
 
@@ -68,7 +67,9 @@ public class Hivemalldoc {
 
             String extended = sbExtended.toString();
             if (!extended.isEmpty()) {
-                sb.append(StringUtils.indent(MarkdownUtils.asListElement(escapeHtml(extended))));
+                sb.append(StringUtils.indent(MarkdownUtils.asCodeBlock(extended)));
+            } else {
+                sb.append("\n");
             }
 
             String packageName = annotatedClass.getPackage().getName();
