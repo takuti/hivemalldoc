@@ -13,6 +13,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+
 public class Hivemalldoc {
 
     public static void main(String... args) {
@@ -34,31 +36,39 @@ public class Hivemalldoc {
         StringBuilder sb = new StringBuilder();
         Map<String, Set<String>> packages = new TreeMap<>();
 
-        Pattern func = Pattern.compile("_FUNC_(\\(.*?\\))(.*)$");
+        Pattern func = Pattern.compile("_FUNC_(\\(.*?\\))(.*)", Pattern.DOTALL);
 
         for (Class<?> annotatedClass : annotatedClasses) {
             Description description = annotatedClass.getAnnotation(Description.class);
 
-            sb.append(MarkdownUtils.asListElement(description.name()));
+            String[] values = description.value().split("\n", 2);
+
+            String value = values[0];
+            Matcher matcher = func.matcher(value);
+            if (matcher.find()) {
+                value = MarkdownUtils.asInlineCode(description.name() + matcher.group(1))
+                        + escapeHtml(matcher.group(2));
+            }
+            sb.append(MarkdownUtils.asListElement(value));
 
             Deprecated deprecated = annotatedClass.getAnnotation(Deprecated.class);
             if (deprecated != null) {
                 sb.append(" ").append(MarkdownUtils.asBold("[deprecated]"));
             }
 
-            sb.append("\n");
-
-            String value = description.value();
-            Matcher matcher = func.matcher(value);
-            if (matcher.find()) {
-                value = MarkdownUtils.asCodeBlock(description.name() + matcher.group(1), "sql")
-                        + matcher.group(2).trim();
-            }
-            sb.append(StringUtils.indent(value));
-
-            if (!description.extended().isEmpty()) {
+            StringBuilder sbExtended = new StringBuilder();
+            if (values.length == 2) {
+                sbExtended.append(values[1]);
                 sb.append("\n");
-                sb.append(StringUtils.indent(MarkdownUtils.asListElement(description.extended())));
+            }
+            if (!description.extended().isEmpty()) {
+                sbExtended.append(description.extended());
+                sb.append("\n");
+            }
+
+            String extended = sbExtended.toString();
+            if (!extended.isEmpty()) {
+                sb.append(StringUtils.indent(MarkdownUtils.asListElement(escapeHtml(extended))));
             }
 
             String packageName = annotatedClass.getPackage().getName();

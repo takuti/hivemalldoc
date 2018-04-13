@@ -6,6 +6,10 @@ public class MarkdownUtils {
         return "**" + s + "**";
     }
 
+    public static String asInlineCode(final String s) {
+        return "`" + s + "`";
+    }
+
     public static String asListElement(final String s) {
         return "- " + s;
     }
