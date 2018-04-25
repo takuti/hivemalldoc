@@ -1,6 +1,8 @@
 Hivemalldoc
 ===
 
+***The code has been merged into [hivemall-tools](https://github.com/apache/incubator-hivemall/pull/148).***
+
 Generate a list of UDFs by applying [reflections](https://github.com/ronmamo/reflections) for the [Apache Hivemall](https://github.com/apache/incubator-hivemall) code.
 
 ```
